@@ -1,0 +1,35 @@
+ruleset:
+  - id: rule_003
+    method: POST
+    endpoint: /pix/recurring-payments
+    condition: datetime.fromisoformat(root.data.date).day in [29, 30, 31]
+    code: INVALID_PAYMENT_DATE
+    message: Data de pagamento inexistente deve ser ajustada para o dia útil seguinte.
+
+  - id: rule_005
+    method: PATCH
+    endpoint: /pix/recurring-payments/{recurringPaymentId}
+    condition: root.user == 'payer' and not ('22:00' <= root.time <= '23:59')
+    code: CANCELAMENTO_FORA_PERIODO_PERMITIDO
+    message: Cancelamento fora do horário permitido.
+
+  - id: rule_008
+    method: PATCH
+    endpoint: /recurring-consents/{recurringConsentId}
+    condition: root.riskSignals is not None
+    code: RISK_INDICATORS_REQUIRED
+    message: Para edição sem redirecionamento, é obrigatório o envio de indicadores de risco.
+
+  - id: rule_010
+    method: POST
+    endpoint: /pix/recurring-payments
+    condition: root.data.consentStatus in ['CONSUMED', 'REVOKED', 'REJECTED']
+    code: CONSENTIMENTO_INVALIDO
+    message: 'Consentimento inválido: em estado final.'
+
+  - id: rule_011
+    method: PATCH
+    endpoint: /pix/recurring-payments/{recurringPaymentId}
+    condition: root.data.status not in ['SCHD', 'PDNG']
+    code: PAGAMENTO_NAO_PERMITE_CANCELAMENTO
+    message: Pagamento em status que não permite cancelamento.
