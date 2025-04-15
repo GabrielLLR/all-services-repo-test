@@ -1,3 +1,4 @@
+API: automatic-payments
 ruleset:
   - id: rule_003
     method: POST
